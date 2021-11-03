@@ -2,21 +2,22 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 const datetimePickerInput = document.querySelector('#datetime-picker');
 const startBtn = document.querySelector('[data-start]');
-const daysOutput = document.querySelector('[data-days]');
-const hoursOutput = document.querySelector('[data-hours]');
-const minutesOutput = document.querySelector('[data-minutes]');
-const secondsOutput = document.querySelector('[data-seconds]');
-
 const INTERVAL = 1000;
-const SEC_IN_DAY = 60 * 60 * 24;
-const SEC_IN_HOUR = 60 * 60;
 
+startBtn.setAttribute('disabled', '');
 flatpickr('#datetime-picker', {
-  minDate: 'today',
+  // minDate: 'today',
   enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    console.log(selectedDates[0]);
+  },
 });
 let pickerDateTime = null;
 datetimePickerInput.addEventListener('input', e => {
+  startBtn.removeAttribute('disabled');
   const pickerDate = new Date(e.target.value);
   pickerDateTime = pickerDate.getTime();
 });
@@ -24,23 +25,30 @@ startBtn.addEventListener('click', () => {
   const timerID = setInterval(() => {
     const currentTime = new Date();
     const timeLeft = pickerDateTime - currentTime.getTime();
-    convertToHMS(timeLeft);
+    if (timeLeft / 1000 < 0) {
+      return;
+    }
+    const unitAmount = convertMs(timeLeft);
+    Object.entries(unitAmount).forEach(([unit, amount]) => {
+      const output = document.querySelector(`[data-${unit}]`);
+      output.textContent = addLeadingZero(amount);
+    });
   }, INTERVAL);
 });
-function adjustOutput(unit, unitOutput) {
-  unit < 10 ? (unitOutput.textContent = '0' + unit) : (unitOutput.textContent = unit);
+function convertMs(ms) {
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+
+  const days = Math.floor(ms / day);
+  const hours = Math.floor((ms % day) / hour);
+  const minutes = Math.floor(((ms % day) % hour) / minute);
+  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+
+  return { days, hours, minutes, seconds };
 }
-function convertToHMS(timeLapse) {
-  let seconds = (timeLapse / 1000).toFixed(0);
-  const days = Math.floor(seconds / SEC_IN_DAY);
-  adjustOutput(days, daysOutput);
-  //   console.log('days', days);
-  const hours = Math.floor((seconds - days * SEC_IN_DAY) / SEC_IN_HOUR);
-  adjustOutput(hours, hoursOutput);
-  //   console.log('hours', hours);
-  const minutes = Math.floor((seconds - days * SEC_IN_DAY - hours * SEC_IN_HOUR) / 60);
-  adjustOutput(minutes, minutesOutput);
-  //   console.log('minutes', minutes);
-  seconds = seconds - days * SEC_IN_DAY - hours * SEC_IN_HOUR - minutes * 60;
-  adjustOutput(seconds, secondsOutput);
+
+function addLeadingZero(value) {
+  return value.toString().padStart(2, '0');
 }
