@@ -1,11 +1,12 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-const datetimePickerInput = document.querySelector('#datetime-picker');
 const startBtn = document.querySelector('[data-start]');
 const INTERVAL = 1000;
 
 startBtn.setAttribute('disabled', '');
-flatpickr('#datetime-picker', {
+
+let selected = null;
+const fp = flatpickr('#datetime-picker', {
   // minDate: 'today',
   enableTime: true,
   time_24hr: true,
@@ -13,19 +14,23 @@ flatpickr('#datetime-picker', {
   minuteIncrement: 1,
   onClose(selectedDates) {
     console.log(selectedDates[0]);
+    selected = selectedDates[0].getTime();
+    const current = this.config.defaultDate.getTime();
+    if (current >= selected) {
+      alert('Please choose a date in the future');
+      return;
+    }
+    startBtn.removeAttribute('disabled');
   },
 });
-let pickerDateTime = null;
-datetimePickerInput.addEventListener('input', e => {
-  startBtn.removeAttribute('disabled');
-  const pickerDate = new Date(e.target.value);
-  pickerDateTime = pickerDate.getTime();
-});
 startBtn.addEventListener('click', () => {
+  startBtn.setAttribute('disabled', '');
   const timerID = setInterval(() => {
     const currentTime = new Date();
-    const timeLeft = pickerDateTime - currentTime.getTime();
+    const timeLeft = selected - currentTime.getTime();
     if (timeLeft / 1000 < 0) {
+      console.log('false');
+      clearInterval(timerID);
       return;
     }
     const unitAmount = convertMs(timeLeft);
