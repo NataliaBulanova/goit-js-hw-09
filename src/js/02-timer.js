@@ -2,6 +2,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 const startBtn = document.querySelector('[data-start]');
+const inputEl = document.querySelector('#datetime-picker');
 const INTERVAL = 1000;
 
 startBtn.setAttribute('disabled', '');
@@ -23,15 +24,17 @@ const fp = flatpickr('#datetime-picker', {
       return;
     }
     startBtn.removeAttribute('disabled');
+    inputEl.setAttribute('disabled', '');
   },
 });
-startBtn.addEventListener('click', () => {
+startBtn.addEventListener('click', startCountdown);
+function startCountdown() {
   startBtn.setAttribute('disabled', '');
-  console.log(fp.config.clickOpens);
   const timerID = setInterval(() => {
     const currentTime = new Date();
     const timeLeft = selected - currentTime.getTime();
     if (timeLeft / 1000 < 0) {
+      Notify.success('The time is over');
       console.log('false');
       clearInterval(timerID);
       return;
@@ -42,7 +45,7 @@ startBtn.addEventListener('click', () => {
       output.textContent = addLeadingZero(amount);
     });
   }, INTERVAL);
-});
+}
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
