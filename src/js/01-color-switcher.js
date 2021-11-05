@@ -1,6 +1,6 @@
 const startBtn = document.querySelector('[data-start]');
 const stopBTN = document.querySelector('[data-stop]');
-stopBTN.setAttribute('disabled', '');
+stopBTN.setAttribute('disabled', true);
 const COLORCHANGE_INTERVAL = 1000;
 let timerId = null;
 function getRandomHexColor() {
@@ -10,7 +10,7 @@ function changeColor(color) {
   document.body.style.backgroundColor = color;
 }
 function toggleBtn(offBtn, onBtn) {
-  offBtn.setAttribute('disabled', '');
+  offBtn.setAttribute('disabled', true);
   onBtn.removeAttribute('disabled');
 }
 
