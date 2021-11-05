@@ -15,7 +15,7 @@ const fp = flatpickr('#datetime-picker', {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    console.log(selectedDates[0]);
+    // console.log(selectedDates[0]);
     selected = selectedDates[0].getTime();
     const current = this.config.defaultDate.getTime();
     if (current >= selected) {
@@ -35,7 +35,7 @@ function startCountdown() {
     const timeLeft = selected - currentTime.getTime();
     if (timeLeft / 1000 < 0) {
       Notify.success('The time is over');
-      console.log('false');
+      // console.log('the time is ran out');
       clearInterval(timerID);
       return;
     }
