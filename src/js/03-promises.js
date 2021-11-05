@@ -4,7 +4,7 @@ const form = document.querySelector('.form');
 form.addEventListener('submit', onFormSubmit);
 function onFormSubmit(event) {
   event.preventDefault();
-  let [delay, step, amount] = form.elements;
+  let [delay, step, amount] = event.currentTarget.elements;
   delay = +delay.value;
   step = +step.value;
   amount = +amount.value;
@@ -31,5 +31,5 @@ function createPromise(position, delay) {
     } else {
       reject({ position, delay });
     }
-  }, delay);
+  });
 }
